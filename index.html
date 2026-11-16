@@ -143,7 +143,6 @@
     pointer-events: auto;
   }
 
-  /* 極低調的頂部狀態列：60 秒倒數 ＋ 剩餘機會（完全不暴露位置） */
   .play-hud {
     position: fixed;
     top: 14px;
@@ -161,10 +160,10 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* 線索一：沉罐毳微弱眨眼反光（極暗，一閃即逝） */
+  /* 微弱眨眼反光線索 */
   .eye-glint {
     position: fixed;
-    width: 26px;
+    width: 28px;
     height: 10px;
     transform: translate(-50%, -50%);
     display: flex;
@@ -175,17 +174,16 @@
     z-index: 3;
   }
   .eye-glint span {
-    width: 6px;
-    height: 6px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.85);
-    box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
   }
   .eye-glint.blink {
-    animation: quickBlink 0.28s ease-in-out forwards;
+    animation: quickBlink 0.34s ease-in-out forwards;
   }
 
-  /* 線索二：點錯後沉罐毳的微弱呼救方向文字 */
   .whisper-clue {
     position: fixed;
     bottom: 28px;
@@ -195,7 +193,7 @@
     text-align: center;
     font-size: 15px;
     font-weight: 700;
-    color: rgba(226, 232, 240, 0.82);
+    color: rgba(226, 232, 240, 0.84);
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
     letter-spacing: 0.8px;
     pointer-events: none;
@@ -213,6 +211,7 @@
     inset: 0;
     background: #000000;
     display: none;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     z-index: 50;
@@ -228,6 +227,39 @@
     object-fit: cover;
     object-position: center 32%;
     animation: jumpZoom 0.12s ease-out forwards, hardShake 0.08s infinite;
+  }
+  /* 搞笑反差女鬼專屬模式（白底照片用 multiply 融進粉紅恐怖閃光背景） */
+  .jumpscare-layer.funny-mode {
+    background: radial-gradient(circle at 50% 45%, #FFF1F2 0%, #FDA4AF 60%, #9F1239 100%);
+    animation: funnyFlash 0.16s infinite;
+  }
+  .jumpscare-layer.funny-mode .jumpscare-img {
+    object-fit: contain;
+    height: 78%;
+    mix-blend-mode: multiply;
+    animation: jumpZoomFunny 0.14s ease-out forwards, hardShake 0.09s infinite;
+  }
+  .funny-caption {
+    display: none;
+    position: absolute;
+    bottom: 6%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    text-align: center;
+    font-size: 32px;
+    font-weight: 900;
+    color: #FFF1F2;
+    background: rgba(159, 18, 57, 0.92);
+    border: 3px solid #FFFFFF;
+    border-radius: 16px;
+    padding: 10px 14px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+    letter-spacing: 2px;
+    z-index: 55;
+  }
+  .jumpscare-layer.funny-mode .funny-caption {
+    display: block;
   }
 
   /* ==================== 4. 成功救援畫面 ==================== */
@@ -247,18 +279,23 @@
   }
   .rescue-photo-wrap {
     width: 100%;
-    max-height: 55vh;
-    aspect-ratio: 3 / 4;
-    border-radius: 18px;
+    max-width: 320px;
+    aspect-ratio: 1 / 1;
+    border-radius: 24px;
     overflow: hidden;
-    border: 2px solid rgba(250, 204, 21, 0.6);
-    box-shadow: 0 0 36px rgba(250, 204, 21, 0.25);
-    background: #000000;
+    border: 3px solid rgba(250, 204, 21, 0.85);
+    box-shadow: 0 0 42px rgba(250, 204, 21, 0.4);
+    background: radial-gradient(circle at 50% 50%, #FEF9C3 0%, #FDE047 65%, #F59E0B 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
   }
   .rescue-photo-wrap img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+    mix-blend-mode: multiply;
     display: block;
   }
   .rescue-title {
@@ -314,13 +351,17 @@
   /* ==================== 動畫關鍵影格 ==================== */
   @keyframes quickBlink {
     0% { opacity: 0; transform: translate(-50%, -50%) scaleY(0.2); }
-    35% { opacity: 0.28; transform: translate(-50%, -50%) scaleY(1); }
-    70% { opacity: 0.22; transform: translate(-50%, -50%) scaleY(0.8); }
+    35% { opacity: 0.32; transform: translate(-50%, -50%) scaleY(1); }
+    70% { opacity: 0.24; transform: translate(-50%, -50%) scaleY(0.8); }
     100% { opacity: 0; transform: translate(-50%, -50%) scaleY(0.1); }
   }
   @keyframes jumpZoom {
     0% { transform: scale(0.75); filter: brightness(2.2) contrast(1.5); }
     100% { transform: scale(1.18); filter: brightness(1.05) contrast(1.25); }
+  }
+  @keyframes jumpZoomFunny {
+    0% { transform: scale(0.65) rotate(-6deg); }
+    100% { transform: scale(1.05) rotate(0deg); }
   }
   @keyframes hardShake {
     0%, 100% { translate: 0 0; }
@@ -332,6 +373,10 @@
   @keyframes bgFlash {
     0%, 100% { background: #000000; }
     50% { background: #2A0000; }
+  }
+  @keyframes funnyFlash {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.15); }
   }
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(18px); }
@@ -347,11 +392,11 @@
     <h1 class="game-title">拯救沉罐毳</h1>
     <div class="story-box">
       <p>沉罐毳本人膚色很黑，而且<b>非常怕黑</b>。他被困在伸手不見五指的黑暗裡，快在 <b>60 秒</b>內找到他！</p>
-      <p class="clue-tip">👁 <b>微弱線索</b>：仔細盯著黑暗，偶爾會閃過一絲微弱眨眼；點錯後也能聽見他從某個方向傳來的微弱呼救。</p>
+      <p class="clue-tip">👁 <b>微弱線索</b>：每次點錯他都會嚇到換位子！盯緊黑暗中偶爾閃過的一對眨眼微光，才能抓到他真正的躲藏點！</p>
       <p class="rule-warn">⚠ 你只有 3 次錯誤機會與 60 秒時間：每次點錯都會引來不同女鬼貼臉驚嚇，第 3 次失敗或超時即救援結束！</p>
     </div>
     <button id="startBtn" class="btn-primary">開始救援 ▶</button>
-    <div class="sound-tip">🔊 建議開啟音量以獲得完整驚悚與線索體驗</div>
+    <div class="sound-tip">🔊 建議開啟音量以獲得完整驚悚與反差體驗</div>
   </section>
 
   <!-- 2. 全黑尋人遊戲畫面 -->
@@ -368,13 +413,14 @@
   <!-- 3. 恐怖女鬼 Jump Scare 層 -->
   <div id="jumpscareLayer" class="jumpscare-layer">
     <img id="jumpscareImg" class="jumpscare-img" src="ghost_jumpscare.jpg" alt="恐怖女鬼">
+    <div class="funny-caption">討厭啦～人家是女鬼 ✌️</div>
   </div>
 
   <!-- 4. 成功救援畫面 -->
   <section id="successScreen" class="screen">
     <div class="rescue-card">
       <div class="rescue-photo-wrap">
-        <img src="chen_rescued.jpg" alt="獲救的沉罐毳">
+        <img src="chen_rescued_real.jpg" alt="獲救的沉罐毳">
       </div>
       <div class="rescue-title">恭喜！你終於把沉罐毳救出來了！</div>
       <div class="rescue-sub" id="successStats">你在第 1 次尋找就成功救出他！</div>
@@ -391,36 +437,36 @@
 
 <script>
 (() => {
-  const GHOST_IMAGES = [
-    'ghost_jumpscare.jpg',
-    'ghost_jumpscare_2.jpg',
-    'ghost_jumpscare_3.jpg'
+  const GHOSTS = [
+    { src: 'ghost_jumpscare.jpg',   funny: false },
+    { src: 'ghost_funny.jpg',       funny: true  },
+    { src: 'ghost_jumpscare_3.jpg', funny: false }
   ];
 
-  // 預載所有圖片，確保 Jump Scare 零延遲
-  [...GHOST_IMAGES, 'chen_rescued.jpg'].forEach(src => {
+  // 預載所有圖片
+  [...GHOSTS.map(g => g.src), 'chen_rescued_real.jpg'].forEach(src => {
     const img = new Image();
     img.src = src;
   });
 
-  const startScreen    = document.getElementById('startScreen');
-  const playScreen     = document.getElementById('playScreen');
-  const successScreen  = document.getElementById('successScreen');
-  const failScreen     = document.getElementById('failScreen');
+  const startScreen     = document.getElementById('startScreen');
+  const playScreen      = document.getElementById('playScreen');
+  const successScreen   = document.getElementById('successScreen');
+  const failScreen      = document.getElementById('failScreen');
 
-  const startBtn       = document.getElementById('startBtn');
+  const startBtn        = document.getElementById('startBtn');
   const retrySuccessBtn = document.getElementById('retrySuccessBtn');
-  const retryFailBtn   = document.getElementById('retryFailBtn');
+  const retryFailBtn    = document.getElementById('retryFailBtn');
 
-  const timerHud       = document.getElementById('timerHud');
-  const chancesHud     = document.getElementById('chancesHud');
-  const eyeGlint       = document.getElementById('eyeGlint');
-  const whisperClue    = document.getElementById('whisperClue');
-  const introPrompt    = document.getElementById('introPrompt');
-  const jumpscareLayer = document.getElementById('jumpscareLayer');
-  const jumpscareImg   = document.getElementById('jumpscareImg');
-  const successStats   = document.getElementById('successStats');
-  const failDesc       = document.getElementById('failDesc');
+  const timerHud        = document.getElementById('timerHud');
+  const chancesHud      = document.getElementById('chancesHud');
+  const eyeGlint        = document.getElementById('eyeGlint');
+  const whisperClue     = document.getElementById('whisperClue');
+  const introPrompt     = document.getElementById('introPrompt');
+  const jumpscareLayer  = document.getElementById('jumpscareLayer');
+  const jumpscareImg    = document.getElementById('jumpscareImg');
+  const successStats    = document.getElementById('successStats');
+  const failDesc        = document.getElementById('failDesc');
 
   let audioCtx = null;
   let state = 'idle'; // idle | intro | searching | scare | ended
@@ -458,7 +504,6 @@
     }
   }
 
-  // 合成極度突發刺耳的恐怖女鬼尖嘯＋重低音衝擊音效
   function playJumpScareSound() {
     if (!audioCtx) return;
     const now = audioCtx.currentTime;
@@ -509,27 +554,6 @@
     noise.start(now);
   }
 
-  // 微弱緊張心跳聲（距離越近越急促）
-  function playHeartbeat(isClose) {
-    if (!audioCtx) return;
-    const now = audioCtx.currentTime;
-    const beats = isClose ? [0, 0.18, 0.42, 0.6] : [0, 0.25];
-    beats.forEach(offset => {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(62, now + offset);
-      osc.frequency.exponentialRampToValueAtTime(38, now + offset + 0.12);
-      gain.gain.setValueAtTime(0.001, now + offset);
-      gain.gain.linearRampToValueAtTime(isClose ? 0.35 : 0.18, now + offset + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.14);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(now + offset);
-      osc.stop(now + offset + 0.15);
-    });
-  }
-
   function playRescueSound() {
     if (!audioCtx) return;
     const now = audioCtx.currentTime;
@@ -553,6 +577,7 @@
     target.classList.add('active');
   }
 
+  // 每次都重新隨機藏身位置，且盡量避開上一次的位置
   function randomizeTarget() {
     const w = window.innerWidth;
     const h = window.innerHeight;
@@ -561,8 +586,14 @@
     const marginYTop = Math.max(hitRadius + 46, h * 0.17);
     const marginYBottom = Math.max(hitRadius + 30, h * 0.15);
 
-    targetX = marginX + Math.random() * Math.max(10, w - marginX * 2);
-    targetY = marginYTop + Math.random() * Math.max(10, h - marginYTop - marginYBottom);
+    let nx = targetX, ny = targetY;
+    for (let k = 0; k < 5; k++) {
+      nx = marginX + Math.random() * Math.max(10, w - marginX * 2);
+      ny = marginYTop + Math.random() * Math.max(10, h - marginYTop - marginYBottom);
+      if (Math.hypot(nx - targetX, ny - targetY) > hitRadius * 1.8) break;
+    }
+    targetX = nx;
+    targetY = ny;
 
     eyeGlint.style.left = `${targetX}px`;
     eyeGlint.style.top = `${targetY}px`;
@@ -575,30 +606,13 @@
     eyeGlint.classList.add('blink');
   }
 
-  function showDirectionWhisper(tapX, tapY) {
-    const dx = targetX - tapX;
-    const dy = targetY - tapY;
-    const dist = Math.hypot(dx, dy);
-
-    let dir = '';
-    if (Math.abs(dy) > hitRadius * 0.6) dir += dy < 0 ? '上' : '下';
-    if (Math.abs(dx) > hitRadius * 0.6) dir += dx < 0 ? '左' : '右';
-    if (!dir) dir = '附近';
-    else if (dir.length === 1) dir = `正${dir}方`;
-    else dir = `${dir[1]}${dir[0]}方`; // 如「右上方」、「左下方」
-
-    const isClose = dist <= hitRadius * 2.4;
-    playHeartbeat(isClose);
-
-    whisperClue.textContent = isClose
-      ? `「……好近！我就在剛才那點的【${dir}】發抖……救我……」`
-      : `「……好黑……我好像在剛才那點的【${dir}】……」`;
-
+  function showMovedWhisper() {
+    whisperClue.textContent = '「……嚇死我了！我又躲到別的地方了……仔細看黑暗裡的眨眼！」';
     clearTimeout(whisperTimer);
     whisperClue.classList.add('show');
     whisperTimer = setTimeout(() => {
       whisperClue.classList.remove('show');
-    }, 2100);
+    }, 2000);
   }
 
   function cleanupTimers() {
@@ -616,7 +630,7 @@
     timerHud.textContent = `剩餘時間：${remain.toFixed(1)}s`;
 
     if (remain <= 0 && state === 'searching') {
-      triggerJumpScare(null, null, true);
+      triggerJumpScare(true);
       return;
     }
     rafId = requestAnimationFrame(timerLoop);
@@ -625,13 +639,13 @@
   function startGame() {
     unlockAudio();
     cleanupTimers();
-    jumpscareLayer.classList.remove('active');
+    jumpscareLayer.classList.remove('active', 'funny-mode');
     whisperClue.classList.remove('show');
     eyeGlint.classList.remove('blink');
 
     chancesLeft = 3;
     attempts = 0;
-    ghostOrder = shuffle(GHOST_IMAGES);
+    ghostOrder = shuffle(GHOSTS);
     ghostIdx = 0;
 
     timerHud.textContent = '剩餘時間：60.0s';
@@ -648,23 +662,22 @@
       searchStartTime = performance.now();
       rafId = requestAnimationFrame(timerLoop);
 
-      // 每 3.5 秒極短暫閃現一次沉罐毳眨眼微光線索
-      blinkInterval = setInterval(triggerEyeBlink, 3500);
-      setTimeout(triggerEyeBlink, 1400);
+      blinkInterval = setInterval(triggerEyeBlink, 2800);
+      setTimeout(triggerEyeBlink, 1000);
     }, 1500);
   }
 
-  function triggerJumpScare(tapX, tapY, isTimeout = false) {
+  function triggerJumpScare(isTimeout = false) {
     state = 'scare';
     if (!isTimeout) {
       chancesLeft -= 1;
       chancesHud.textContent = `剩餘機會：${chancesLeft}`;
     }
 
-    // 切換不一樣的恐怖女鬼圖片
-    const nextGhost = ghostOrder[ghostIdx % ghostOrder.length];
+    const g = ghostOrder[ghostIdx % ghostOrder.length];
     ghostIdx += 1;
-    jumpscareImg.setAttribute('src', nextGhost);
+    jumpscareImg.setAttribute('src', g.src);
+    jumpscareLayer.classList.toggle('funny-mode', g.funny);
 
     jumpscareImg.style.animation = 'none';
     void jumpscareImg.offsetWidth;
@@ -675,7 +688,7 @@
     if (navigator.vibrate) navigator.vibrate([120, 40, 220, 40, 180]);
 
     scareTimer = setTimeout(() => {
-      jumpscareLayer.classList.remove('active');
+      jumpscareLayer.classList.remove('active', 'funny-mode');
       if (isTimeout || chancesLeft <= 0) {
         state = 'ended';
         cleanupTimers();
@@ -684,8 +697,11 @@
           : '三次機會全數用盡。<br>沉罐毳依然被困在無盡的黑暗之中，而女鬼已經找上你了……';
         showScreen(failScreen);
       } else {
+        // 每次點錯後，沉罐毳立刻換到一個新的位置並閃一下眨眼微光
+        randomizeTarget();
         state = 'searching';
-        showDirectionWhisper(tapX, tapY);
+        showMovedWhisper();
+        setTimeout(triggerEyeBlink, 450);
       }
     }, 1500);
   }
@@ -706,7 +722,7 @@
       successStats.textContent = `你在 ${usedSec} 秒內、第 ${attempts} 次尋找成功救出沉罐毳！`;
       showScreen(successScreen);
     } else {
-      triggerJumpScare(clientX, clientY, false);
+      triggerJumpScare(false);
     }
   }
 
