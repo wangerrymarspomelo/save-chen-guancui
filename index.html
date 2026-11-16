@@ -160,7 +160,7 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* 微弱眨眼反光線索（0.1 秒極限閃現） */
+  /* 微弱眨眼反光線索（主角與搞笑誘餌外觀、大小、閃爍時間 0.12s 完全一致） */
   .eye-glint {
     position: fixed;
     width: 28px;
@@ -180,16 +180,8 @@
     background: rgba(255, 255, 255, 0.95);
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
   }
-  /* 爆笑女鬼的反光誘餌（戴墨鏡的微粉紫反光，0.1 秒閃現） */
-  .eye-glint.decoy span {
-    width: 10px;
-    height: 5px;
-    border-radius: 3px;
-    background: rgba(253, 164, 175, 0.92);
-    box-shadow: 0 0 10px rgba(244, 114, 182, 0.75);
-  }
   .eye-glint.blink {
-    animation: quickBlink 0.15s linear forwards;
+    animation: quickBlink 0.12s linear forwards;
   }
 
   .whisper-clue {
@@ -399,7 +391,7 @@
     <h1 class="game-title">拯救沉罐毳</h1>
     <div class="story-box">
       <p>沉罐毳本人膚色很黑，而且<b>非常怕黑</b>。他被困在伸手不見五指的黑暗裡，快在 <b>60 秒</b>內找到他！</p>
-      <p class="clue-tip">👁 <b>微弱線索</b>：每次點錯他都會嚇到換位子！盯緊黑暗中閃過 0.15 秒的一對眨眼微光，別點錯成粉紅誘餌！</p>
+      <p class="clue-tip">👁 <b>微弱線索</b>：每次點錯他都會嚇到換位子！黑暗中會同時閃過 0.12 秒的眨眼微光——其中一個是沉罐毳，另一個可能是陷阱！</p>
       <p class="rule-warn">⚠ 限時 60 秒求生：點錯幾次沒關係，但每次點錯都會引來不同女鬼貼臉驚嚇；時間歸零仍未救出即救援失敗！</p>
     </div>
     <button id="startBtn" class="btn-primary">開始救援 ▶</button>
