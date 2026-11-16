@@ -160,7 +160,7 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* 微弱眨眼反光線索（主角與搞笑誘餌外觀、大小、閃爍時間 0.12s 完全一致） */
+  /* 微弱眨眼反光線索（主角與搞笑誘餌外觀、大小、閃爍時間 0.1s 完全一致） */
   .eye-glint {
     position: fixed;
     width: 28px;
@@ -181,7 +181,7 @@
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
   }
   .eye-glint.blink {
-    animation: quickBlink 0.12s linear forwards;
+    animation: quickBlink 0.1s linear forwards;
   }
 
   .whisper-clue {
@@ -391,8 +391,8 @@
     <h1 class="game-title">拯救沉罐毳</h1>
     <div class="story-box">
       <p>沉罐毳本人膚色很黑，而且<b>非常怕黑</b>。他被困在伸手不見五指的黑暗裡，快在 <b>60 秒</b>內找到他！</p>
-      <p class="clue-tip">👁 <b>微弱線索</b>：每次點錯他都會嚇到換位子！黑暗中會同時閃過 0.12 秒的眨眼微光——其中一個是沉罐毳，另一個可能是陷阱！</p>
-      <p class="rule-warn">⚠ 限時 60 秒求生：點錯幾次沒關係，但每次點錯都會引來不同女鬼貼臉驚嚇；時間歸零仍未救出即救援失敗！</p>
+      <p class="clue-tip">👁 <b>微弱線索</b>：每次點錯他都會嚇到換位子！黑暗中會同時閃過 0.1 秒的眨眼微光——其中一個是沉罐毳，另一個可能是陷阱！</p>
+      <p class="rule-warn">⚠ 限時 60 秒求生：點錯位置就會引來不同女鬼貼臉驚嚇；時間歸零仍未救出即救援失敗！</p>
     </div>
     <button id="startBtn" class="btn-primary">開始救援 ▶</button>
     <div class="sound-tip">🔊 建議開啟音量以獲得完整驚悚與反差體驗</div>
@@ -402,7 +402,6 @@
   <section id="playScreen" class="screen">
     <div class="play-hud">
       <span id="timerHud">剩餘時間：60.0s</span>
-      <span id="chancesHud">被嚇次數：0 次</span>
     </div>
     <div id="eyeGlint" class="eye-glint"><span></span><span></span></div>
     <div id="decoyGlint" class="eye-glint decoy"><span></span><span></span></div>
@@ -459,7 +458,6 @@
   const retryFailBtn    = document.getElementById('retryFailBtn');
 
   const timerHud        = document.getElementById('timerHud');
-  const chancesHud      = document.getElementById('chancesHud');
   const eyeGlint        = document.getElementById('eyeGlint');
   const decoyGlint      = document.getElementById('decoyGlint');
   const whisperClue     = document.getElementById('whisperClue');
@@ -476,8 +474,6 @@
   let decoyX = 0;
   let decoyY = 0;
   let hitRadius = 56;
-  let scareCount = 0;
-  let attempts = 0;
   let ghostOrder = [];
   let ghostIdx = 0;
 
@@ -661,13 +657,10 @@
     eyeGlint.classList.remove('blink');
     decoyGlint.classList.remove('blink');
 
-    scareCount = 0;
-    attempts = 0;
     ghostOrder = shuffle(GHOSTS);
     ghostIdx = 0;
 
     timerHud.textContent = '剩餘時間：60.0s';
-    chancesHud.textContent = `被嚇次數：0 次`;
     randomizeTarget();
 
     state = 'intro';
@@ -687,10 +680,6 @@
 
   function triggerJumpScare(isTimeout = false, forceFunny = false) {
     state = 'scare';
-    if (!isTimeout) {
-      scareCount += 1;
-      chancesHud.textContent = `被嚇次數：${scareCount} 次`;
-    }
 
     const g = forceFunny
       ? { src: 'ghost_funny.jpg', funny: true }
@@ -712,7 +701,7 @@
       if (isTimeout) {
         state = 'ended';
         cleanupTimers();
-        failDesc.innerHTML = `60 秒時間到……（共被女鬼嚇了 ${scareCount} 次）<br>黑暗徹底吞噬了這片空間，沉罐毳再也出不來了……`;
+        failDesc.innerHTML = `60 秒時間到……<br>黑暗徹底吞噬了這片空間，沉罐毳再也出不來了……`;
         showScreen(failScreen);
       } else {
         // 每次點錯後，沉罐毳立刻換到一個新的位置並閃一下眨眼微光
@@ -726,7 +715,6 @@
 
   function handleSearchTap(clientX, clientY) {
     if (state !== 'searching') return;
-    attempts += 1;
 
     const dx = clientX - targetX;
     const dy = clientY - targetY;
@@ -739,7 +727,7 @@
       cleanupTimers();
       const usedSec = ((performance.now() - searchStartTime) / 1000).toFixed(1);
       playRescueSound();
-      successStats.textContent = `你在 ${usedSec} 秒內、第 ${attempts} 次尋找成功救出沉罐毳！`;
+      successStats.textContent = `你在 ${usedSec} 秒內成功救出沉罐毳！`;
       showScreen(successScreen);
     } else {
       triggerJumpScare(false, hitDecoy);
