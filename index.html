@@ -189,7 +189,7 @@
     box-shadow: 0 0 10px rgba(244, 114, 182, 0.75);
   }
   .eye-glint.blink {
-    animation: quickBlink 0.1s linear forwards;
+    animation: quickBlink 0.15s linear forwards;
   }
 
   .whisper-clue {
@@ -399,8 +399,8 @@
     <h1 class="game-title">拯救沉罐毳</h1>
     <div class="story-box">
       <p>沉罐毳本人膚色很黑，而且<b>非常怕黑</b>。他被困在伸手不見五指的黑暗裡，快在 <b>60 秒</b>內找到他！</p>
-      <p class="clue-tip">👁 <b>微弱線索</b>：每次點錯他都會嚇到換位子！盯緊黑暗中偶爾閃過的一對眨眼微光，才能抓到他真正的躲藏點！</p>
-      <p class="rule-warn">⚠ 你只有 3 次錯誤機會與 60 秒時間：每次點錯都會引來不同女鬼貼臉驚嚇，第 3 次失敗或超時即救援結束！</p>
+      <p class="clue-tip">👁 <b>微弱線索</b>：每次點錯他都會嚇到換位子！盯緊黑暗中閃過 0.15 秒的一對眨眼微光，別點錯成粉紅誘餌！</p>
+      <p class="rule-warn">⚠ 限時 60 秒求生：點錯幾次沒關係，但每次點錯都會引來不同女鬼貼臉驚嚇；時間歸零仍未救出即救援失敗！</p>
     </div>
     <button id="startBtn" class="btn-primary">開始救援 ▶</button>
     <div class="sound-tip">🔊 建議開啟音量以獲得完整驚悚與反差體驗</div>
@@ -410,7 +410,7 @@
   <section id="playScreen" class="screen">
     <div class="play-hud">
       <span id="timerHud">剩餘時間：60.0s</span>
-      <span id="chancesHud">剩餘機會：3</span>
+      <span id="chancesHud">被嚇次數：0 次</span>
     </div>
     <div id="eyeGlint" class="eye-glint"><span></span><span></span></div>
     <div id="decoyGlint" class="eye-glint decoy"><span></span><span></span></div>
@@ -484,7 +484,7 @@
   let decoyX = 0;
   let decoyY = 0;
   let hitRadius = 56;
-  let chancesLeft = 3;
+  let scareCount = 0;
   let attempts = 0;
   let ghostOrder = [];
   let ghostIdx = 0;
@@ -669,13 +669,13 @@
     eyeGlint.classList.remove('blink');
     decoyGlint.classList.remove('blink');
 
-    chancesLeft = 3;
+    scareCount = 0;
     attempts = 0;
     ghostOrder = shuffle(GHOSTS);
     ghostIdx = 0;
 
     timerHud.textContent = '剩餘時間：60.0s';
-    chancesHud.textContent = `剩餘機會：${chancesLeft}`;
+    chancesHud.textContent = `被嚇次數：0 次`;
     randomizeTarget();
 
     state = 'intro';
@@ -696,8 +696,8 @@
   function triggerJumpScare(isTimeout = false, forceFunny = false) {
     state = 'scare';
     if (!isTimeout) {
-      chancesLeft -= 1;
-      chancesHud.textContent = `剩餘機會：${chancesLeft}`;
+      scareCount += 1;
+      chancesHud.textContent = `被嚇次數：${scareCount} 次`;
     }
 
     const g = forceFunny
@@ -717,12 +717,10 @@
 
     scareTimer = setTimeout(() => {
       jumpscareLayer.classList.remove('active', 'funny-mode');
-      if (isTimeout || chancesLeft <= 0) {
+      if (isTimeout) {
         state = 'ended';
         cleanupTimers();
-        failDesc.innerHTML = isTimeout
-          ? '60 秒時間到……黑暗徹底吞噬了這片空間，<br>沉罐毳再也出不來了……'
-          : '三次機會全數用盡。<br>沉罐毳依然被困在無盡的黑暗之中，而女鬼已經找上你了……';
+        failDesc.innerHTML = `60 秒時間到……（共被女鬼嚇了 ${scareCount} 次）<br>黑暗徹底吞噬了這片空間，沉罐毳再也出不來了……`;
         showScreen(failScreen);
       } else {
         // 每次點錯後，沉罐毳立刻換到一個新的位置並閃一下眨眼微光
