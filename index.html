@@ -160,7 +160,7 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* 微弱眨眼反光線索 */
+  /* 微弱眨眼反光線索（0.1 秒極限閃現） */
   .eye-glint {
     position: fixed;
     width: 28px;
@@ -177,11 +177,19 @@
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  }
+  /* 爆笑女鬼的反光誘餌（戴墨鏡的微粉紫反光，0.1 秒閃現） */
+  .eye-glint.decoy span {
+    width: 10px;
+    height: 5px;
+    border-radius: 3px;
+    background: rgba(253, 164, 175, 0.92);
+    box-shadow: 0 0 10px rgba(244, 114, 182, 0.75);
   }
   .eye-glint.blink {
-    animation: quickBlink 0.34s ease-in-out forwards;
+    animation: quickBlink 0.1s linear forwards;
   }
 
   .whisper-clue {
@@ -350,10 +358,9 @@
 
   /* ==================== 動畫關鍵影格 ==================== */
   @keyframes quickBlink {
-    0% { opacity: 0; transform: translate(-50%, -50%) scaleY(0.2); }
-    35% { opacity: 0.32; transform: translate(-50%, -50%) scaleY(1); }
-    70% { opacity: 0.24; transform: translate(-50%, -50%) scaleY(0.8); }
-    100% { opacity: 0; transform: translate(-50%, -50%) scaleY(0.1); }
+    0% { opacity: 0; transform: translate(-50%, -50%) scaleY(0.4); }
+    40% { opacity: 0.45; transform: translate(-50%, -50%) scaleY(1); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scaleY(0.2); }
   }
   @keyframes jumpZoom {
     0% { transform: scale(0.75); filter: brightness(2.2) contrast(1.5); }
@@ -406,6 +413,7 @@
       <span id="chancesHud">剩餘機會：3</span>
     </div>
     <div id="eyeGlint" class="eye-glint"><span></span><span></span></div>
+    <div id="decoyGlint" class="eye-glint decoy"><span></span><span></span></div>
     <div id="whisperClue" class="whisper-clue"></div>
     <div id="introPrompt" class="intro-prompt">沉罐毳被困在黑暗中，<br>快救救他！</div>
   </section>
@@ -461,6 +469,7 @@
   const timerHud        = document.getElementById('timerHud');
   const chancesHud      = document.getElementById('chancesHud');
   const eyeGlint        = document.getElementById('eyeGlint');
+  const decoyGlint      = document.getElementById('decoyGlint');
   const whisperClue     = document.getElementById('whisperClue');
   const introPrompt     = document.getElementById('introPrompt');
   const jumpscareLayer  = document.getElementById('jumpscareLayer');
@@ -472,6 +481,8 @@
   let state = 'idle'; // idle | intro | searching | scare | ended
   let targetX = 0;
   let targetY = 0;
+  let decoyX = 0;
+  let decoyY = 0;
   let hitRadius = 56;
   let chancesLeft = 3;
   let attempts = 0;
@@ -595,15 +606,29 @@
     targetX = nx;
     targetY = ny;
 
+    // 同時隨機生成爆笑女鬼反光誘餌位置（避開主角位置）
+    let dx = targetX, dy = targetY;
+    for (let k = 0; k < 10; k++) {
+      dx = marginX + Math.random() * Math.max(10, w - marginX * 2);
+      dy = marginYTop + Math.random() * Math.max(10, h - marginYTop - marginYBottom);
+      if (Math.hypot(dx - targetX, dy - targetY) > hitRadius * 2.4) break;
+    }
+    decoyX = dx;
+    decoyY = dy;
+
     eyeGlint.style.left = `${targetX}px`;
     eyeGlint.style.top = `${targetY}px`;
+    decoyGlint.style.left = `${decoyX}px`;
+    decoyGlint.style.top = `${decoyY}px`;
   }
 
   function triggerEyeBlink() {
     if (state !== 'searching') return;
-    eyeGlint.classList.remove('blink');
-    void eyeGlint.offsetWidth;
-    eyeGlint.classList.add('blink');
+    [eyeGlint, decoyGlint].forEach(el => {
+      el.classList.remove('blink');
+      void el.offsetWidth;
+      el.classList.add('blink');
+    });
   }
 
   function showMovedWhisper() {
@@ -642,6 +667,7 @@
     jumpscareLayer.classList.remove('active', 'funny-mode');
     whisperClue.classList.remove('show');
     eyeGlint.classList.remove('blink');
+    decoyGlint.classList.remove('blink');
 
     chancesLeft = 3;
     attempts = 0;
@@ -667,15 +693,17 @@
     }, 1500);
   }
 
-  function triggerJumpScare(isTimeout = false) {
+  function triggerJumpScare(isTimeout = false, forceFunny = false) {
     state = 'scare';
     if (!isTimeout) {
       chancesLeft -= 1;
       chancesHud.textContent = `剩餘機會：${chancesLeft}`;
     }
 
-    const g = ghostOrder[ghostIdx % ghostOrder.length];
-    ghostIdx += 1;
+    const g = forceFunny
+      ? { src: 'ghost_funny.jpg', funny: true }
+      : ghostOrder[ghostIdx % ghostOrder.length];
+    if (!forceFunny) ghostIdx += 1;
     jumpscareImg.setAttribute('src', g.src);
     jumpscareLayer.classList.toggle('funny-mode', g.funny);
 
@@ -714,6 +742,8 @@
     const dy = clientY - targetY;
     const dist = Math.hypot(dx, dy);
 
+    const hitDecoy = Math.hypot(clientX - decoyX, clientY - decoyY) <= hitRadius;
+
     if (dist <= hitRadius) {
       state = 'ended';
       cleanupTimers();
@@ -722,7 +752,7 @@
       successStats.textContent = `你在 ${usedSec} 秒內、第 ${attempts} 次尋找成功救出沉罐毳！`;
       showScreen(successScreen);
     } else {
-      triggerJumpScare(false);
+      triggerJumpScare(false, hitDecoy);
     }
   }
 
