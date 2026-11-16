@@ -36,7 +36,7 @@
 
   /* ==================== 1. 開始畫面 ==================== */
   #startScreen {
-    padding: 28px 22px;
+    padding: 26px 20px;
     background: radial-gradient(circle at 50% 35%, #160808 0%, #050505 55%, #000000 100%);
     text-align: center;
   }
@@ -49,7 +49,7 @@
     background: rgba(127, 29, 29, 0.25);
     padding: 5px 14px;
     border-radius: 999px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
   .game-title {
     font-size: 38px;
@@ -60,35 +60,39 @@
     margin-bottom: 14px;
   }
   .story-box {
-    max-width: 380px;
-    background: rgba(15, 15, 18, 0.85);
+    max-width: 390px;
+    background: rgba(15, 15, 18, 0.88);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 16px;
-    padding: 18px 18px;
-    font-size: 15px;
-    line-height: 1.75;
+    padding: 16px 18px;
+    font-size: 14.5px;
+    line-height: 1.7;
     color: #CBD5E1;
-    margin-bottom: 24px;
+    margin-bottom: 22px;
     text-align: left;
   }
   .story-box p + p {
-    margin-top: 10px;
+    margin-top: 8px;
   }
   .story-box b {
     color: #FCA5A5;
   }
+  .clue-tip {
+    color: #94A3B8;
+    font-size: 13.5px;
+  }
   .rule-warn {
     color: #EF4444;
     font-weight: 800;
-    font-size: 14px;
-    margin-top: 12px;
+    font-size: 13.5px;
+    margin-top: 10px;
     padding-top: 10px;
     border-top: 1px dashed rgba(239, 68, 68, 0.35);
   }
   .btn-primary {
     width: 100%;
     max-width: 320px;
-    padding: 16px 24px;
+    padding: 15px 24px;
     font-size: 20px;
     font-weight: 900;
     letter-spacing: 2px;
@@ -110,7 +114,7 @@
     color: #64748B;
   }
 
-  /* ==================== 2. 全黑尋人畫面 ==================== */
+  /* ==================== 2. 全黑尋人遊戲畫面 ==================== */
   #playScreen {
     background: #000000;
     cursor: crosshair;
@@ -139,18 +143,68 @@
     pointer-events: auto;
   }
 
-  /* 極低調的剩餘次數提示，不提供任何空間線索 */
-  .chances-hud {
+  /* 極低調的頂部狀態列：60 秒倒數 ＋ 剩餘機會（完全不暴露位置） */
+  .play-hud {
     position: fixed;
     top: 14px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 16px;
+    right: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     font-size: 13px;
-    font-weight: 700;
-    color: rgba(185, 28, 28, 0.65);
+    font-weight: 800;
+    color: rgba(185, 28, 28, 0.72);
     letter-spacing: 1px;
     pointer-events: none;
     z-index: 5;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* 線索一：沉罐毳微弱眨眼反光（極暗，一閃即逝） */
+  .eye-glint {
+    position: fixed;
+    width: 26px;
+    height: 10px;
+    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 3;
+  }
+  .eye-glint span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+  }
+  .eye-glint.blink {
+    animation: quickBlink 0.28s ease-in-out forwards;
+  }
+
+  /* 線索二：點錯後沉罐毳的微弱呼救方向文字 */
+  .whisper-clue {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 88%;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+    color: rgba(226, 232, 240, 0.82);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
+    letter-spacing: 0.8px;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 6;
+    transition: opacity 0.35s ease;
+  }
+  .whisper-clue.show {
+    opacity: 1;
   }
 
   /* ==================== 3. 女鬼 Jump Scare 全螢幕層 ==================== */
@@ -235,7 +289,7 @@
     transform: scale(0.96);
   }
 
-  /* ==================== 5. 失敗畫面（3 次機會用盡） ==================== */
+  /* ==================== 5. 失敗畫面 ==================== */
   #failScreen {
     padding: 28px 22px;
     background: radial-gradient(circle at 50% 40%, #2A0505 0%, #050505 70%, #000000 100%);
@@ -258,6 +312,12 @@
   }
 
   /* ==================== 動畫關鍵影格 ==================== */
+  @keyframes quickBlink {
+    0% { opacity: 0; transform: translate(-50%, -50%) scaleY(0.2); }
+    35% { opacity: 0.28; transform: translate(-50%, -50%) scaleY(1); }
+    70% { opacity: 0.22; transform: translate(-50%, -50%) scaleY(0.8); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scaleY(0.1); }
+  }
   @keyframes jumpZoom {
     0% { transform: scale(0.75); filter: brightness(2.2) contrast(1.5); }
     100% { transform: scale(1.18); filter: brightness(1.05) contrast(1.25); }
@@ -283,26 +343,31 @@
 
   <!-- 1. 開始畫面 -->
   <section id="startScreen" class="screen active">
-    <div class="horror-badge">極度黑暗 · 恐怖反應測試</div>
+    <div class="horror-badge">限時 60 秒 · 黑暗求生</div>
     <h1 class="game-title">拯救沉罐毳</h1>
     <div class="story-box">
-      <p>沉罐毳本人膚色很黑，而且<b>非常怕黑</b>。</p>
-      <p>現在他被困在一片伸手不見五指的黑暗裡，你必須在全黑的螢幕中點擊尋找他真正躲藏的位置。</p>
-      <p class="rule-warn">⚠ 黑暗中藏著可怕的東西：你只有 3 次錯誤機會，點錯就會觸發恐怖女鬼；第 3 次失敗即救援結束！</p>
+      <p>沉罐毳本人膚色很黑，而且<b>非常怕黑</b>。他被困在伸手不見五指的黑暗裡，快在 <b>60 秒</b>內找到他！</p>
+      <p class="clue-tip">👁 <b>微弱線索</b>：仔細盯著黑暗，偶爾會閃過一絲微弱眨眼；點錯後也能聽見他從某個方向傳來的微弱呼救。</p>
+      <p class="rule-warn">⚠ 你只有 3 次錯誤機會與 60 秒時間：每次點錯都會引來不同女鬼貼臉驚嚇，第 3 次失敗或超時即救援結束！</p>
     </div>
     <button id="startBtn" class="btn-primary">開始救援 ▶</button>
-    <div class="sound-tip">🔊 建議開啟手機音量以獲得完整驚悚體驗</div>
+    <div class="sound-tip">🔊 建議開啟音量以獲得完整驚悚與線索體驗</div>
   </section>
 
   <!-- 2. 全黑尋人遊戲畫面 -->
   <section id="playScreen" class="screen">
-    <div id="chancesHud" class="chances-hud">剩餘機會：3</div>
+    <div class="play-hud">
+      <span id="timerHud">剩餘時間：60.0s</span>
+      <span id="chancesHud">剩餘機會：3</span>
+    </div>
+    <div id="eyeGlint" class="eye-glint"><span></span><span></span></div>
+    <div id="whisperClue" class="whisper-clue"></div>
     <div id="introPrompt" class="intro-prompt">沉罐毳被困在黑暗中，<br>快救救他！</div>
   </section>
 
   <!-- 3. 恐怖女鬼 Jump Scare 層 -->
   <div id="jumpscareLayer" class="jumpscare-layer">
-    <img class="jumpscare-img" src="ghost_jumpscare.jpg" alt="恐怖女鬼">
+    <img id="jumpscareImg" class="jumpscare-img" src="ghost_jumpscare.jpg" alt="恐怖女鬼">
   </div>
 
   <!-- 4. 成功救援畫面 -->
@@ -312,7 +377,7 @@
         <img src="chen_rescued.jpg" alt="獲救的沉罐毳">
       </div>
       <div class="rescue-title">恭喜！你終於把沉罐毳救出來了！</div>
-      <div class="rescue-sub" id="successStats">你在第 1 次點擊就成功找到他！</div>
+      <div class="rescue-sub" id="successStats">你在第 1 次尋找就成功救出他！</div>
       <button id="retrySuccessBtn" class="btn-success">再玩一次 🔄</button>
     </div>
   </section>
@@ -320,14 +385,20 @@
   <!-- 5. 救援失敗畫面 -->
   <section id="failScreen" class="screen">
     <div class="fail-title">救援失敗……</div>
-    <p class="fail-desc">三次機會全數用盡。<br>沉罐毳依然被困在無盡的黑暗之中，而女鬼已經找上你了……</p>
+    <p class="fail-desc" id="failDesc">三次機會全數用盡。<br>沉罐毳依然被困在無盡的黑暗之中，而女鬼已經找上你了……</p>
     <button id="retryFailBtn" class="btn-primary">重新挑戰 🔄</button>
   </section>
 
 <script>
 (() => {
-  // 預載圖片，確保觸發 Jump Scare 零延遲
-  ['ghost_jumpscare.jpg', 'chen_rescued.jpg'].forEach(src => {
+  const GHOST_IMAGES = [
+    'ghost_jumpscare.jpg',
+    'ghost_jumpscare_2.jpg',
+    'ghost_jumpscare_3.jpg'
+  ];
+
+  // 預載所有圖片，確保 Jump Scare 零延遲
+  [...GHOST_IMAGES, 'chen_rescued.jpg'].forEach(src => {
     const img = new Image();
     img.src = src;
   });
@@ -341,10 +412,15 @@
   const retrySuccessBtn = document.getElementById('retrySuccessBtn');
   const retryFailBtn   = document.getElementById('retryFailBtn');
 
+  const timerHud       = document.getElementById('timerHud');
   const chancesHud     = document.getElementById('chancesHud');
+  const eyeGlint       = document.getElementById('eyeGlint');
+  const whisperClue    = document.getElementById('whisperClue');
   const introPrompt    = document.getElementById('introPrompt');
   const jumpscareLayer = document.getElementById('jumpscareLayer');
+  const jumpscareImg   = document.getElementById('jumpscareImg');
   const successStats   = document.getElementById('successStats');
+  const failDesc       = document.getElementById('failDesc');
 
   let audioCtx = null;
   let state = 'idle'; // idle | intro | searching | scare | ended
@@ -353,8 +429,24 @@
   let hitRadius = 56;
   let chancesLeft = 3;
   let attempts = 0;
+  let ghostOrder = [];
+  let ghostIdx = 0;
+
+  let searchStartTime = 0;
+  let rafId = null;
   let introTimer = null;
   let scareTimer = null;
+  let blinkInterval = null;
+  let whisperTimer = null;
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
 
   function unlockAudio() {
     if (!audioCtx) {
@@ -372,9 +464,7 @@
     const now = audioCtx.currentTime;
     const dur = 1.35;
 
-    // 1. 不和諧高頻尖嘯群
-    const freqs = [740, 815, 1180, 1490];
-    freqs.forEach((f, idx) => {
+    [740, 815, 1180, 1490].forEach((f, idx) => {
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = idx % 2 === 0 ? 'sawtooth' : 'square';
@@ -391,7 +481,6 @@
       osc.stop(now + dur);
     });
 
-    // 2. 重低音驚悚轟鳴
     const sub = audioCtx.createOscillator();
     const subGain = audioCtx.createGain();
     sub.type = 'triangle';
@@ -404,7 +493,6 @@
     sub.start(now);
     sub.stop(now + 1.0);
 
-    // 3. 爆裂白噪音
     const bufSize = Math.floor(audioCtx.sampleRate * 0.8);
     const buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
     const data = buf.getChannelData(0);
@@ -419,6 +507,27 @@
     noise.connect(nGain);
     nGain.connect(audioCtx.destination);
     noise.start(now);
+  }
+
+  // 微弱緊張心跳聲（距離越近越急促）
+  function playHeartbeat(isClose) {
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    const beats = isClose ? [0, 0.18, 0.42, 0.6] : [0, 0.25];
+    beats.forEach(offset => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(62, now + offset);
+      osc.frequency.exponentialRampToValueAtTime(38, now + offset + 0.12);
+      gain.gain.setValueAtTime(0.001, now + offset);
+      gain.gain.linearRampToValueAtTime(isClose ? 0.35 : 0.18, now + offset + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.14);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now + offset);
+      osc.stop(now + offset + 0.15);
+    });
   }
 
   function playRescueSound() {
@@ -447,24 +556,85 @@
   function randomizeTarget() {
     const w = window.innerWidth;
     const h = window.innerHeight;
-    // 避開最邊緣 14%，並維持合理觸控命中半徑（短邊的 14%，至少 48px）
     hitRadius = Math.max(48, Math.round(Math.min(w, h) * 0.14));
     const marginX = Math.max(hitRadius, w * 0.14);
-    const marginYTop = Math.max(hitRadius + 40, h * 0.16);
-    const marginYBottom = Math.max(hitRadius, h * 0.14);
+    const marginYTop = Math.max(hitRadius + 46, h * 0.17);
+    const marginYBottom = Math.max(hitRadius + 30, h * 0.15);
 
     targetX = marginX + Math.random() * Math.max(10, w - marginX * 2);
     targetY = marginYTop + Math.random() * Math.max(10, h - marginYTop - marginYBottom);
+
+    eyeGlint.style.left = `${targetX}px`;
+    eyeGlint.style.top = `${targetY}px`;
+  }
+
+  function triggerEyeBlink() {
+    if (state !== 'searching') return;
+    eyeGlint.classList.remove('blink');
+    void eyeGlint.offsetWidth;
+    eyeGlint.classList.add('blink');
+  }
+
+  function showDirectionWhisper(tapX, tapY) {
+    const dx = targetX - tapX;
+    const dy = targetY - tapY;
+    const dist = Math.hypot(dx, dy);
+
+    let dir = '';
+    if (Math.abs(dy) > hitRadius * 0.6) dir += dy < 0 ? '上' : '下';
+    if (Math.abs(dx) > hitRadius * 0.6) dir += dx < 0 ? '左' : '右';
+    if (!dir) dir = '附近';
+    else if (dir.length === 1) dir = `正${dir}方`;
+    else dir = `${dir[1]}${dir[0]}方`; // 如「右上方」、「左下方」
+
+    const isClose = dist <= hitRadius * 2.4;
+    playHeartbeat(isClose);
+
+    whisperClue.textContent = isClose
+      ? `「……好近！我就在剛才那點的【${dir}】發抖……救我……」`
+      : `「……好黑……我好像在剛才那點的【${dir}】……」`;
+
+    clearTimeout(whisperTimer);
+    whisperClue.classList.add('show');
+    whisperTimer = setTimeout(() => {
+      whisperClue.classList.remove('show');
+    }, 2100);
+  }
+
+  function cleanupTimers() {
+    cancelAnimationFrame(rafId);
+    clearTimeout(introTimer);
+    clearTimeout(scareTimer);
+    clearTimeout(whisperTimer);
+    clearInterval(blinkInterval);
+  }
+
+  function timerLoop(now) {
+    if (state === 'ended' || state === 'idle' || state === 'intro') return;
+    const elapsed = (now - searchStartTime) / 1000;
+    const remain = Math.max(0, 60 - elapsed);
+    timerHud.textContent = `剩餘時間：${remain.toFixed(1)}s`;
+
+    if (remain <= 0 && state === 'searching') {
+      triggerJumpScare(null, null, true);
+      return;
+    }
+    rafId = requestAnimationFrame(timerLoop);
   }
 
   function startGame() {
     unlockAudio();
-    clearTimeout(introTimer);
-    clearTimeout(scareTimer);
+    cleanupTimers();
     jumpscareLayer.classList.remove('active');
+    whisperClue.classList.remove('show');
+    eyeGlint.classList.remove('blink');
 
     chancesLeft = 3;
     attempts = 0;
+    ghostOrder = shuffle(GHOST_IMAGES);
+    ghostIdx = 0;
+
+    timerHud.textContent = '剩餘時間：60.0s';
     chancesHud.textContent = `剩餘機會：${chancesLeft}`;
     randomizeTarget();
 
@@ -475,19 +645,30 @@
     introTimer = setTimeout(() => {
       introPrompt.classList.remove('visible');
       state = 'searching';
-    }, 1600);
+      searchStartTime = performance.now();
+      rafId = requestAnimationFrame(timerLoop);
+
+      // 每 3.5 秒極短暫閃現一次沉罐毳眨眼微光線索
+      blinkInterval = setInterval(triggerEyeBlink, 3500);
+      setTimeout(triggerEyeBlink, 1400);
+    }, 1500);
   }
 
-  function triggerJumpScare() {
+  function triggerJumpScare(tapX, tapY, isTimeout = false) {
     state = 'scare';
-    chancesLeft -= 1;
-    chancesHud.textContent = `剩餘機會：${chancesLeft}`;
+    if (!isTimeout) {
+      chancesLeft -= 1;
+      chancesHud.textContent = `剩餘機會：${chancesLeft}`;
+    }
 
-    // 重新觸發動畫與音效
-    const img = jumpscareLayer.querySelector('.jumpscare-img');
-    img.style.animation = 'none';
-    void img.offsetWidth;
-    img.style.animation = '';
+    // 切換不一樣的恐怖女鬼圖片
+    const nextGhost = ghostOrder[ghostIdx % ghostOrder.length];
+    ghostIdx += 1;
+    jumpscareImg.setAttribute('src', nextGhost);
+
+    jumpscareImg.style.animation = 'none';
+    void jumpscareImg.offsetWidth;
+    jumpscareImg.style.animation = '';
 
     jumpscareLayer.classList.add('active');
     playJumpScareSound();
@@ -495,11 +676,16 @@
 
     scareTimer = setTimeout(() => {
       jumpscareLayer.classList.remove('active');
-      if (chancesLeft <= 0) {
+      if (isTimeout || chancesLeft <= 0) {
         state = 'ended';
+        cleanupTimers();
+        failDesc.innerHTML = isTimeout
+          ? '60 秒時間到……黑暗徹底吞噬了這片空間，<br>沉罐毳再也出不來了……'
+          : '三次機會全數用盡。<br>沉罐毳依然被困在無盡的黑暗之中，而女鬼已經找上你了……';
         showScreen(failScreen);
       } else {
         state = 'searching';
+        showDirectionWhisper(tapX, tapY);
       }
     }, 1500);
   }
@@ -514,15 +700,16 @@
 
     if (dist <= hitRadius) {
       state = 'ended';
+      cleanupTimers();
+      const usedSec = ((performance.now() - searchStartTime) / 1000).toFixed(1);
       playRescueSound();
-      successStats.textContent = `你在第 ${attempts} 次尋找成功救出沉罐毳！`;
+      successStats.textContent = `你在 ${usedSec} 秒內、第 ${attempts} 次尋找成功救出沉罐毳！`;
       showScreen(successScreen);
     } else {
-      triggerJumpScare();
+      triggerJumpScare(clientX, clientY, false);
     }
   }
 
-  // 同時支援手機觸控與電腦滑鼠點擊（避免 touchstart + click 雙重觸發）
   let touchHandled = false;
   playScreen.addEventListener('touchstart', (e) => {
     if (state !== 'searching') return;
